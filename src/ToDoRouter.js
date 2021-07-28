@@ -16,7 +16,7 @@ class MyRouter extends Component {
         return (
           <Switch>
             <Route path="/" exact >
-                <Redirect to={`/to-do-lists/${today}`} />
+                <Redirect to={`/to-do-lists`} />
             </Route>
             <Route path={`/to-do-lists`} exact component={ToDoGridCardView} />
             <Route path={`/to-do-lists/:date`} exact component={ToDoCard} />

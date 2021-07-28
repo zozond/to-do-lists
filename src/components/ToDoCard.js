@@ -1,87 +1,8 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Card, Icon, Button, Input, List, Label } from 'semantic-ui-react'
 
-const sample = [
-    {
-      "id" : 1,
-      "date": "2021-07-26",
-      "list" : []
-    }, 
-    {
-      "id" : 2,
-      "date": "2021-07-25",
-      "list" : [
-        { 
-          label: "치과가기",
-          checked: true
-        }
-      ]
-    },
-    {
-      "id" : 3,
-      "date": "2021-07-24",
-      "list" : [
-        { 
-          label: "등본 뽑기",
-          checked: false
-        },
-        { 
-          label: "설거지",
-          checked: true
-        }
-      ]
-    }
-    ,
-    {
-      "id" : 4,
-      "date": "2021-07-23",
-      "list" : []
-    }, 
-    
-    {
-      "id" : 5,
-      "date": "2021-07-22",
-      "list" : [
-        { 
-          label: "밥 사주기",
-          checked: false
-        },
-        { 
-          label: "고기 사오기",
-          checked: false
-        },
-        { 
-          label: "공부하기",
-          checked: false
-        },
-      ]
-    },
-    {
-      "id" : 6,
-      "date": "2021-07-21",
-      "list" : [
-        { 
-          label: "고양이 보러가기",
-          checked: false
-        },
-        { 
-          label: "공부하기",
-          checked: false
-        },
-      ]
-    },
-    {
-      "id" : 7,
-      "date": "2021-07-20",
-      "list" : [
-        { 
-          label: "일하기",
-          checked: false
-        }
-      ]
-    }];
 
 const convertKoreanDate = (currentDate) => {
     let day = "";
@@ -114,37 +35,41 @@ const convertKoreanDate = (currentDate) => {
       return day;
 }
 
-const ToDoCard = ({item, disable}) => {
+const ToDoCard = ({item, disable}) =>  {
+    const [ id, setId ] = useState(0)
     const [ list, setList ] = useState([]);
     const [ date, setDate ] = useState("");
     const [ day, setDay ] = useState("");
     const [ openToDoInput, setOpenToDoInput ] = useState(true);
 
-    useEffect(() => {
+    useEffect( () => {
         if(item === undefined){
-            let flag = false;
-            let idx = window.location.pathname.lastIndexOf("/")
-            let date = window.location.pathname.substring(idx+1);
-
-            sample.forEach((item) => {
+            axios.get(`/database?_sort=id&_order=desc`)
+            .then((res) => {
+              let idx = window.location.pathname.lastIndexOf("/")
+              let date = window.location.pathname.substring(idx+1);
+              let toDoLists = res.data
+              toDoLists.forEach((item) => {
                 if( item.date === date){
-                    flag = true;
-                    let toDoLists = item.list;
+                    let behaviors = item.list;
                     let date = item.date;
                     let currentDate = new Date(date)
-                    setList(toDoLists)
+                    let id = item.id;
+                    setId(id);
+                    setList(behaviors)
                     setDate(date)
                     setDay(convertKoreanDate(currentDate.getDay()));
                 }
+              })
+            }).catch((err) => {
+              console.log(err)
             })
-
-            if(flag == false){
-                window.location.href = "/to-do-lists"
-            }
         }else{
             let toDoLists = item.list;
             let date = item.date;
             let currentDate = new Date(date)
+            let id = item.id;
+            setId(id)
             setList(toDoLists)
             setDate(date)
             setDay(convertKoreanDate(currentDate.getDay()));
@@ -152,10 +77,23 @@ const ToDoCard = ({item, disable}) => {
         
     }, []);
 
+    const update = (newList) => {
+      let data = {}
+      data.id = id;
+      data.list = newList;
+      data.date = date;
+      axios.put(`/database/${id}`, data)
+        .then((res)=> {
+          console.log(res)
+        }).catch((err)=>{
+          console.log(err)
+        })
+    }
+
     return (
   <Card>
     <Card.Content>
-      <Card.Header> <Link to={`/to-do-list/${date}`}> {date} </Link> </Card.Header>
+      <Card.Header> <Link to={`/to-do-lists/${date}`}> {date} </Link> </Card.Header>
       <Card.Meta>
         <span className='date'> {day} </span>
       </Card.Meta>
@@ -194,7 +132,9 @@ const ToDoCard = ({item, disable}) => {
                             <Button 
                                 icon
                                 onClick={() => {
-                                    setList(list.slice(0, index).concat(list.slice(index+1, list.length)));
+                                    let newList = list.slice(0, index).concat(list.slice(index+1, list.length))
+                                    setList(newList);
+                                    update(newList);
                                 }}>
                                 <Icon size="large" name='trash alternate' />
                             </Button>
@@ -212,6 +152,7 @@ const ToDoCard = ({item, disable}) => {
                         list.push({label: event.target.value, checked: false})
                         setList(list)
                         setOpenToDoInput(!openToDoInput);
+                        update(list);
                     }
                 }}
                 />
