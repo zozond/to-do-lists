@@ -1,14 +1,30 @@
 {
   "database": [
     {
-      "id": 2,
-      "list": [],
-      "date": "2021-07-27"
-    },
+      "userId": 1,
+      "data": [
+        {
+          "date": "2021-08-02",
+          "list": []
+        },
+        {
+          "date": "2021-08-03",
+          "list": [
+            {
+              "label": "아 왜요",
+              "checked": false
+            }
+          ]
+        }
+      ],
+      "id": 1
+    }
+  ],
+  "user": [
     {
-      "id": 3,
-      "list": [],
-      "date": "2021-07-28"
+      "email": "admin@example.com",
+      "password": "admin",
+      "id": 1
     }
   ]
 }

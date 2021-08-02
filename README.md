@@ -7,10 +7,10 @@ UI로는 semantic-ui를 사용하여 간결한 통일감을 만들었습니다.
 리액트에 대한 내용을 습득 및 활용하기 위한 프로젝트 입니다.
 
 # 해야 할 것
-- 시간이 지났을 때 지난 to do list에서 클릭을 할 수 없게 처리.
-- UI 수정 
+- redux 적용
+- 코드 정리
 
 # Database
-- json-server 사용
+## json-server 사용
 - npm i -g json-server
 - json-server -p 8080 ./database/db.json
